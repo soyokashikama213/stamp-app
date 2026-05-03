@@ -18,7 +18,6 @@ const HABIT_COLORS = [
 
 export default function HomePage() {
   const supabase = createClient();
-  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [habits, setHabits] = useState<Habit[]>([]);
   const [stamps, setStamps] = useState<Stamp[]>([]);
@@ -26,22 +25,31 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [showManager, setShowManager] = useState(false);
 
-  useEffect(() => {
-  if (user === null && !loading) {
-    router.push("/auth");
-  }
-}, [user, loading]);
+  const router = useRouter();
 
-  // ユーザー取得
-  useEffect(() => {
-  supabase.auth.getSession().then(({ data }) => {
-    setUser(data.session?.user ?? null);
+useEffect(() => {
+  const getSession = async () => {
+    const { data } = await supabase.auth.getSession();
+    const session = data.session;
+
+    if (!session) {
+      router.push("/auth");
+    } else {
+      setUser(session.user);
+    }
+
     setLoading(false);
-  });
+  };
+
+  getSession();
 
   const { data: { subscription } } = supabase.auth.onAuthStateChange(
     (_, session) => {
-      setUser(session?.user ?? null);
+      if (!session) {
+        router.push("/auth");
+      } else {
+        setUser(session.user);
+      }
     }
   );
 

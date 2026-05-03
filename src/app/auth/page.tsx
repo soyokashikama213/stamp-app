@@ -22,7 +22,7 @@ export default function AuthPage() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-       redirectTo: "https://regoillibgrxphkadnlv.supabase.co/auth/v1/callback"
+       redirectTo: "https://stamp-app-ashy.vercel.app"
       },
     });
   };

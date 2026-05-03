@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --pink:    #FFD6E0;
+  --peach:   #FFECCC;
+  --mint:    #C8F5E0;
+  --sky:     #C8E6FA;
+  --lavender:#E8D5FF;
+  --stamp-done: #FF8FAB;
+  --stamp-bg:   #FFF5F8;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: linear-gradient(135deg, #FFF5F8 0%, #FFF0F5 50%, #F8F0FF 100%);
+  min-height: 100vh;
+}
+
+/* スタンプのポワンアニメーション */
+@keyframes powa {
+  0%   { transform: scale(0.4); opacity: 0; }
+  55%  { transform: scale(1.25); opacity: 1; }
+  75%  { transform: scale(0.92); }
+  90%  { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes ripple {
+  0%   { transform: scale(0); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.animate-powa    { animation: powa 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.animate-ripple  { animation: ripple 0.5s ease-out forwards; }
+.animate-fade-up { animation: fadeSlideUp 0.35s ease forwards; }
+
+.stamp-btn {
+  position: relative;
+  overflow: visible;
+  transition: transform 0.15s ease;
+}
+.stamp-btn:hover  { transform: scale(1.08); }
+.stamp-btn:active { transform: scale(0.94); }
+
+/* カレンダーのグリッドスクロール */
+.calendar-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ガラスモーフィズム風カード */
+.glass-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+/* 達成率バー */
+.progress-bar {
+  background: linear-gradient(
+    90deg,
+    #FF8FAB 0%,
+    #FFB3C6 50%,
+    #FFCCDB 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* スクロールバー（細くかわいく） */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #FFB3C6;
+  border-radius: 99px;
+}

@@ -6,6 +6,7 @@ import type { Habit, Stamp } from "@/types";
 import Calendar from "@/components/Calendar";
 import HabitManager from "@/components/HabitManager";
 import StatsBar from "@/components/StatsBar";
+import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import {
   format, startOfMonth, endOfMonth, eachDayOfInterval,
@@ -17,6 +18,7 @@ const HABIT_COLORS = [
 
 export default function HomePage() {
   const supabase = createClient();
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [habits, setHabits] = useState<Habit[]>([]);
   const [stamps, setStamps] = useState<Stamp[]>([]);
@@ -24,14 +26,27 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [showManager, setShowManager] = useState(false);
 
+  useEffect(() => {
+  if (user === null && !loading) {
+    router.push("/auth");
+  }
+}, [user, loading]);
+
   // ユーザー取得
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_, session) => setUser(session?.user ?? null)
-    );
-    return () => subscription.unsubscribe();
-  }, []);
+  supabase.auth.getSession().then(({ data }) => {
+    setUser(data.session?.user ?? null);
+    setLoading(false);
+  });
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    (_, session) => {
+      setUser(session?.user ?? null);
+    }
+  );
+
+  return () => subscription.unsubscribe();
+}, []);
 
   // 習慣一覧取得
   const fetchHabits = useCallback(async () => {
@@ -60,7 +75,6 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!user) return;
-    Promise.all([fetchHabits(), fetchStamps()]).finally(() => setLoading(false));
   }, [user, fetchHabits, fetchStamps]);
 
   // スタンプを押す / 外す

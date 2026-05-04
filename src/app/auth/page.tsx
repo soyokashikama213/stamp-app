@@ -6,7 +6,34 @@ import { useRouter } from "next/navigation"; // ← ここ追加
 export default function AuthPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
-  const router = useRouter(); // ← ここ追加
+  const router = useRouter(); 
+
+  useEffect(() => {
+  const init = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      router.replace("/auth");
+    } else {
+      setUser(session.user);
+    }
+
+    setLoading(false);
+  };
+
+  init();
+
+  const { data: { subscription } } =
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setUser(session.user);
+      } else {
+        router.replace("/auth");
+      }
+    });
+
+  return () => subscription.unsubscribe();
+}, []);
 
  const handleGoogleLogin = async () => {
   setLoading(true);

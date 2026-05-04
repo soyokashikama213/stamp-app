@@ -25,9 +25,7 @@ export async function GET(request: Request) {
     }
   );
 
-  // セッション確定
   await supabase.auth.getSession();
 
-  // ホームへリダイレクト
   return NextResponse.redirect(new URL("/", requestUrl.origin));
 }

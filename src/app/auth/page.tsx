@@ -8,24 +8,22 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter(); // ← ここ追加
 
-  // 👇 ここ追加（ログイン済みならトップへ飛ばす）
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        router.push("/");
-      }
-    });
-  }, []);
+ const handleGoogleLogin = async () => {
+  setLoading(true);
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-       redirectTo: "https://stamp-app-ashy.vercel.app"
-      },
-    });
-  };
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${location.origin}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    console.error(error);
+    alert("ログイン失敗");
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

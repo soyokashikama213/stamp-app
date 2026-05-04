@@ -1,56 +1,27 @@
 "use client";
 import { createClient } from "@/lib/supabase";
-import { useState, useEffect } from "react"; // ← ここ追加
-import { useRouter } from "next/navigation"; // ← ここ追加
+import { useState } from "react";
 
 export default function AuthPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
-  const router = useRouter(); 
 
-  useEffect(() => {
-  const init = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+  const handleGoogleLogin = async () => {
+    setLoading(true);
 
-    if (!session) {
-      router.replace("/auth");
-    } else {
-      setUser(session.user);
-    }
-
-    setLoading(false);
-  };
-
-  init();
-
-  const { data: { subscription } } =
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        setUser(session.user);
-      } else {
-        router.replace("/auth");
-      }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${location.origin}/auth/callback`,
+      },
     });
 
-  return () => subscription.unsubscribe();
-}, []);
-
- const handleGoogleLogin = async () => {
-  setLoading(true);
-
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${location.origin}/auth/callback`,
-    },
-  });
-
-  if (error) {
-    console.error(error);
-    alert("ログイン失敗");
-    setLoading(false);
-  }
-};
+    if (error) {
+      console.error(error);
+      alert("ログイン失敗");
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
